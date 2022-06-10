@@ -1,1 +1,87 @@
 PARTICIPANTS: use this file for creating the class diagram in mastery task 01
+
+@startuml
+title Music Playlist
+
+interface RequestHandler
+
+class AddSongToPlaylistActivity implements RequestHandler{
+    -Logger log
+    -PlaylistDao playlistDao
+    -AlbumTrackDao albumTrackDao
+    +handleRequest(final AddSongToPlaylistRequest addSongToPlaylistRequest, Context context) : AddSongToPlaylistResult
+
+}
+
+class CreatePlaylistActivity {
+    -Logger log
+    -PlaylistDao playlistDao
+    +handleRequest(final CreatePlaylistRequest createPlaylistRequest, Context context) : CreatePlaylistResult
+}
+
+class GetPlaylistActivity {
+    -Logger log
+    -PlaylistDao playlistDao
+    +handleRequest(final GetPlaylistRequest getPlaylistRequest, Context context) : GetPlaylistResult
+}
+
+class GetPlaylistSongsActivity {
+    -Logger log
+    -PlaylistDao playlistDao
+    +handleRequest(final GetPlaylistSongsRequest getPlaylistSongsRequest, Context context) : GetPlaylistSongsResult
+}
+
+class UpdatePlaylistActivity{
+    -Logger log
+    -PlaylistDao playlistDao
+    +handleRequest(final UpdatePlaylistRequest updatePlaylistRequest, Context context) : UpdatePlaylistResult
+}
+
+class AlbumTrackDao {
+    dynamoDbMapper : DynamoDBMapper
+}
+
+class PlaylistDao {
+    dynamoDbMapper : DynamoDBMapper
+    +getPlaylist(String id) : Playlist
+}
+
+class AlbumTrackNotFoundException{
+    -{static} long serialVersionUID
+}
+
+class InvalidAttributeValueException {
+    -{static} long serialVersionUID
+}
+
+class PlaylistNotFoundException {
+    -{static} long serialVersionUID
+}
+
+class AlbumTrack {
+    @DynamoDBHashKey asin : String
+    @DynamoDBRangeKey trackNumber : Integer
+    albumName : String
+    songTitle : String
+
+}
+class Playlist{
+    @DynamoDBHashKey id : String
+    name : String
+    customerId : String
+    songCount : Integer
+    tags : Set<String>
+    songList : List<AlbumTrack>
+    +String : getId()
+    +void setId(String id)
+}
+
+Playlist *-- AlbumTrack
+AddSongToPlaylistActivity *-- AlbumTrackDao
+PlaylistDao --* CreatePlaylistActivity
+AddSongToPlaylistActivity *-- PlaylistDao
+GetPlaylistActivity *-- PlaylistDao
+GetPlaylistSongsActivity *-- PlaylistDao
+UpdatePlaylistActivity *-- PlaylistDao
+
+@enduml

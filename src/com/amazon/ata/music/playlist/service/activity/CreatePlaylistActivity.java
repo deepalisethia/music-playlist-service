@@ -1,14 +1,22 @@
 package com.amazon.ata.music.playlist.service.activity;
 
+import com.amazon.ata.music.playlist.service.converters.ModelConverter;
+import com.amazon.ata.music.playlist.service.dynamodb.models.Playlist;
+import com.amazon.ata.music.playlist.service.exceptions.InvalidAttributeValueException;
 import com.amazon.ata.music.playlist.service.models.requests.CreatePlaylistRequest;
 import com.amazon.ata.music.playlist.service.models.results.CreatePlaylistResult;
 import com.amazon.ata.music.playlist.service.models.PlaylistModel;
 import com.amazon.ata.music.playlist.service.dynamodb.PlaylistDao;
 
+import com.amazon.ata.music.playlist.service.util.MusicPlaylistServiceUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Implementation of the CreatePlaylistActivity for the MusicPlaylistService's CreatePlaylist API.
@@ -16,6 +24,7 @@ import org.apache.logging.log4j.Logger;
  * This API allows the customer to create a new playlist with no songs.
  */
 public class CreatePlaylistActivity implements RequestHandler<CreatePlaylistRequest, CreatePlaylistResult> {
+
     private final Logger log = LogManager.getLogger();
     private final PlaylistDao playlistDao;
 
@@ -41,12 +50,36 @@ public class CreatePlaylistActivity implements RequestHandler<CreatePlaylistRequ
      *                              associated with it
      * @return createPlaylistResult result object containing the API defined {@link PlaylistModel}
      */
+
     @Override
     public CreatePlaylistResult handleRequest(final CreatePlaylistRequest createPlaylistRequest, Context context) {
         log.info("Received CreatePlaylistRequest {}", createPlaylistRequest);
+        Set<String> tags = null;
+        if (createPlaylistRequest.getTags().size() == 0) {
+            createPlaylistRequest.equals(null);
+        }
+        if (createPlaylistRequest.getTags() != null) {
+            tags = new HashSet<>(createPlaylistRequest.getTags());
+        }
+        if (!MusicPlaylistServiceUtils.isValidString(createPlaylistRequest.getName())) {
+            throw new InvalidAttributeValueException("Invalid Name");
+        }
+        if (!MusicPlaylistServiceUtils.isValidString(createPlaylistRequest.getCustomerId())) {
+            throw new InvalidAttributeValueException("Invalid Customer ID");
+        }
+
+        Playlist playlist = new Playlist();
+        playlist.setId(MusicPlaylistServiceUtils.generatePlaylistId());
+        playlist.setName(createPlaylistRequest.getName());
+        playlist.setCustomerId(createPlaylistRequest.getCustomerId());
+        playlist.setSongCount(0);
+        playlist.setTags(tags);
+        playlist.setSongList(new ArrayList<>());
+
+        playlistDao.savePlaylist(playlist);
 
         return CreatePlaylistResult.builder()
-                .withPlaylist(new PlaylistModel())
+                .withPlaylist(new ModelConverter().toPlaylistModel(playlist))
                 .build();
     }
 }
