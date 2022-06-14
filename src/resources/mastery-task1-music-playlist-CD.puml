@@ -46,18 +46,6 @@ class PlaylistDao {
     +getPlaylist(String id) : Playlist
 }
 
-class AlbumTrackNotFoundException{
-    -{static} long serialVersionUID
-}
-
-class InvalidAttributeValueException {
-    -{static} long serialVersionUID
-}
-
-class PlaylistNotFoundException {
-    -{static} long serialVersionUID
-}
-
 class AlbumTrack {
     @DynamoDBHashKey asin : String
     @DynamoDBRangeKey trackNumber : Integer
@@ -83,5 +71,33 @@ AddSongToPlaylistActivity *-- PlaylistDao
 GetPlaylistActivity *-- PlaylistDao
 GetPlaylistSongsActivity *-- PlaylistDao
 UpdatePlaylistActivity *-- PlaylistDao
+
+newpage
+class InvalidAttributeChangeException{
+    -{static} long serialVersionUID
+}
+
+class AlbumTrackNotFoundException{
+    -{static} long serialVersionUID
+}
+
+class InvalidAttributeValueException {
+    -{static} long serialVersionUID
+}
+
+class PlaylistNotFoundException {
+    -{static} long serialVersionUID
+}
+
+class InvalidAttributeException {
+    -{static} long serialVersionUID
+}
+
+RuntimeException <|-- InvalidAttributeException
+InvalidAttributeException <|-- InvalidAttributeChangeException
+InvalidAttributeException <|-- InvalidAttributeValueException
+RuntimeException <|-- AlbumTrackNotFoundException
+RuntimeException <|-- PlaylistNotFoundException
+
 
 @enduml

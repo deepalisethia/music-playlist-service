@@ -64,7 +64,7 @@ as well as adding to and retrieving a saved playlist’s list of songs.
   Get Playlists endpoint.
     * We’ve implemented a simple dependency management strategy with our
       `App` class, but we want to refactor it to use the
-      [Dagger framework](https://dagger.dev/users-guide) so we no longer
+      [Dagger framework](https://dagger.dev/users-guide) so we no longerll
       have to hand manage it.
 * The client calling our service will be the Amazon Music Client, used in
   Amazon Music’s various products such as the website, mobile apps, or Alexa
