@@ -17,6 +17,8 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.inject.Inject;
+
 /**
  * Implementation of the UpdatePlaylistActivity for the MusicPlaylistService's UpdatePlaylist API.
  *
@@ -31,6 +33,7 @@ public class UpdatePlaylistActivity implements RequestHandler<UpdatePlaylistRequ
      *
      * @param playlistDao PlaylistDao to access the playlist table.
      */
+    @Inject
     public UpdatePlaylistActivity(PlaylistDao playlistDao) {
         this.playlistDao = playlistDao;
     }
@@ -56,7 +59,7 @@ public class UpdatePlaylistActivity implements RequestHandler<UpdatePlaylistRequ
     @Override
     public UpdatePlaylistResult handleRequest(final UpdatePlaylistRequest updatePlaylistRequest, Context context) throws InvalidAttributeChangeException, InvalidAttributeValueException {
         log.info("Received UpdatePlaylistRequest {}", updatePlaylistRequest);
-        Playlist playlist = new Playlist();
+        Playlist playlist;
         if (!MusicPlaylistServiceUtils.isValidString(updatePlaylistRequest.getName())) {
             throw new InvalidAttributeValueException();
         }
@@ -67,9 +70,6 @@ public class UpdatePlaylistActivity implements RequestHandler<UpdatePlaylistRequ
         }
         if (!playlist.getCustomerId().equals(updatePlaylistRequest.getCustomerId())) {
             throw new InvalidAttributeChangeException();
-        }
-        if (!MusicPlaylistServiceUtils.isValidString(updatePlaylistRequest.getCustomerId())) {
-            throw new InvalidAttributeValueException();
         }
         playlist.setName(updatePlaylistRequest.getName());
         playlistDao.savePlaylist(playlist);
