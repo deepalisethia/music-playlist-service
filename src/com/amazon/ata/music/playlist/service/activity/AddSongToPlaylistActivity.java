@@ -17,8 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,7 +64,7 @@ public class AddSongToPlaylistActivity implements RequestHandler<AddSongToPlayli
         AlbumTrack albumTrack;
 
         ModelConverter modelConverter = new ModelConverter();
-        List<SongModel> songModelList = new ArrayList<>();
+        List<SongModel> songModelList;
 
         try{
             playlist = playlistDao.getPlaylist(addSongToPlaylistRequest.getId());
@@ -79,26 +77,18 @@ public class AddSongToPlaylistActivity implements RequestHandler<AddSongToPlayli
         } catch (AlbumTrackNotFoundException e) {
             throw new AlbumTrackNotFoundException(e.getMessage());
         }
-
+        LinkedList<AlbumTrack> songList = (LinkedList<AlbumTrack>) playlist.getSongList();
         if(addSongToPlaylistRequest.isQueueNext()) {
-            playlist.getSongList().addFirst(albumTrack);
+            songList.addFirst(albumTrack);
         } else {
-            playlist.getSongList().addLast(albumTrack);
+            songList.addLast(albumTrack);
         }
 
         playlist.setSongCount(playlist.getSongCount() + 1);
-
+        playlist.setSongList(songList);
         playlist = playlistDao.savePlaylist(playlist);
 
-        for (AlbumTrack song : playlist.getSongList()) {
-            SongModel songModel = modelConverter.toSongModel(song);
-            songModel.setAsin(albumTrack.getAsin());
-            songModel.setTrackNumber(albumTrack.getTrackNumber());
-            song.setAlbumName(albumTrack.getAlbumName());
-            songModel.setTitle(albumTrack.getSongTitle());
-
-            songModelList.add(songModel);
-        }
+        songModelList = modelConverter.toSongModelList(playlist.getSongList());
 
         return AddSongToPlaylistResult.builder()
                 .withSongList(songModelList)

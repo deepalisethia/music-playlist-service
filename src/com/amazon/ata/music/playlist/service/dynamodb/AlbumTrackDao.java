@@ -12,7 +12,6 @@ import javax.inject.Inject;
  */
 public class AlbumTrackDao {
     private final DynamoDBMapper dynamoDbMapper;
-    private AlbumTrack albumTrack;
     /**
      * Instantiates an AlbumTrackDao object.
      *
@@ -24,9 +23,9 @@ public class AlbumTrackDao {
     }
 
     public AlbumTrack getAlbumTrack (String asin, int trackNumber) {
-        albumTrack = dynamoDbMapper.load(AlbumTrack.class, asin, trackNumber);
+        AlbumTrack albumTrack = dynamoDbMapper.load(AlbumTrack.class, asin, trackNumber);
         if (albumTrack == null) {
-            throw new AlbumTrackNotFoundException();
+            throw new AlbumTrackNotFoundException("Album Track Not Found");
         }
         return albumTrack;
     }

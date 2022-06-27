@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Set;
 @DynamoDBTable(tableName = "playlists")
 public class Playlist {
     private String id;
-    private LinkedList<AlbumTrack> songList;
+    private List<AlbumTrack> songList;
     //New Variables Added
     private String name;
     private String customerId;
@@ -71,11 +72,11 @@ public class Playlist {
     // PARTICIPANTS: You do not need to modify the songList getters/setters or annotations
     @DynamoDBTypeConverted(converter = AlbumTrackLinkedListConverter.class)
     @DynamoDBAttribute(attributeName = "songList")
-    public LinkedList<AlbumTrack> getSongList() {
+    public List<AlbumTrack> getSongList() {
         return songList;
     }
 
-    public void setSongList(LinkedList<AlbumTrack> songList) {
+    public void setSongList(List<AlbumTrack> songList) {
         this.songList = songList;
     }
 }

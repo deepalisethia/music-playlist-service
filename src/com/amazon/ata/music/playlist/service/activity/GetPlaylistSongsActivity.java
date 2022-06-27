@@ -4,11 +4,13 @@ import com.amazon.ata.music.playlist.service.converters.ModelConverter;
 import com.amazon.ata.music.playlist.service.dynamodb.models.AlbumTrack;
 import com.amazon.ata.music.playlist.service.dynamodb.models.Playlist;
 import com.amazon.ata.music.playlist.service.exceptions.PlaylistNotFoundException;
+import com.amazon.ata.music.playlist.service.models.SongOrder;
 import com.amazon.ata.music.playlist.service.models.requests.GetPlaylistSongsRequest;
 import com.amazon.ata.music.playlist.service.models.results.GetPlaylistSongsResult;
 import com.amazon.ata.music.playlist.service.models.SongModel;
 import com.amazon.ata.music.playlist.service.dynamodb.PlaylistDao;
 
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.apache.logging.log4j.LogManager;
@@ -55,16 +57,24 @@ public class GetPlaylistSongsActivity implements RequestHandler<GetPlaylistSongs
         Playlist playlist;
 
         ModelConverter modelConverter = new ModelConverter();
-        LinkedList<SongModel> songModelList;
+        List<SongModel> songModelList;
 
         try{
             playlist = playlistDao.getPlaylist(getPlaylistSongsRequest.getId());
         } catch (PlaylistNotFoundException e) {
             throw new PlaylistNotFoundException(e.getMessage());
         }
+        if (getPlaylistSongsRequest.getOrder() == null) {
+            getPlaylistSongsRequest.setOrder(SongOrder.DEFAULT);
+        }
+        if (getPlaylistSongsRequest.getOrder().equals(SongOrder.SHUFFLED)) {
+                Collections.shuffle(playlist.getSongList());
+        }
+        if (getPlaylistSongsRequest.getOrder().equals(SongOrder.REVERSED)) {
+                Collections.reverse(playlist.getSongList());
+        }
 
         songModelList = modelConverter.toSongModelList(playlist.getSongList());
-
 
         return GetPlaylistSongsResult.builder()
                 .withSongList(songModelList)

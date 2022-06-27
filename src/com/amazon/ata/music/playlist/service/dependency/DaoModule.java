@@ -1,9 +1,6 @@
 package com.amazon.ata.music.playlist.service.dependency;
 
 import com.amazon.ata.aws.dynamodb.DynamoDbClientProvider;
-import com.amazon.ata.music.playlist.service.dynamodb.AlbumTrackDao;
-import com.amazon.ata.music.playlist.service.dynamodb.PlaylistDao;
-import com.amazon.ata.music.playlist.service.exceptions.AlbumTrackNotFoundException;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import dagger.Module;
