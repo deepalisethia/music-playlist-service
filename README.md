@@ -1,0 +1,2 @@
+# music-playlist-service
+describes the Amazon Music Playlist Service, a new AWS service that will provide the custom playlist functionality to meet our customers’ needs. It is designed to interact with the Amazon Music client and will return a list of song metadata associated with the playlist that the Amazon Music client can use to fetch the song file when playing. The project uses AWS Lambda, DynamoDB, API-Gateways and Dagger Framework.
